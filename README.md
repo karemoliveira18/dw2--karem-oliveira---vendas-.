@@ -14,7 +14,10 @@ Sistema para gerenciamento de vendas com funcionalidades para controle de produt
 
 ## Como Executar
 
-1. Clone o repositório
+1. Clone o repositório:
+```bash
+git clone https://github.com/karemoliveira18/dw2--karem-oliveira---vendas-..git
+```
 2. Instale as dependências
 3. Execute o projeto
 
