@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja Escolar</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Loja Escolar</h1>
+        <div class="header-controls">
+            <input type="text" id="search" placeholder="Buscar produto...">
+            <button onclick="abrirModalProduto()" class="add-button">Novo Produto</button>
+            <button id="cart-btn" aria-label="Abrir carrinho">
+                🛒 <span id="cart-count">0</span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section id="product-grid">
+            <!-- Produtos serão carregados aqui -->
+        </section>
+    </main>
+
+    <!-- Modal do Carrinho -->
+    <div id="cart-modal" class="modal hidden">
+        <h2>Carrinho de Compras</h2>
+        <ul id="cart-items"></ul>
+        <p id="cart-total">Total: R$ 0,00</p>
+        <div class="modal-controls">
+            <input type="text" id="coupon" placeholder="Inserir cupom de desconto">
+            <button id="checkout-btn">Finalizar Compra</button>
+            <button id="close-cart" onclick="fecharModalCarrinho()">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Novo Produto -->
+    <div id="product-modal" class="modal hidden">
+        <h2>Adicionar Novo Produto</h2>
+        <form id="product-form" onsubmit="adicionarProduto(event)">
+            <div class="form-group">
+                <label for="nome">Nome do Produto:</label>
+                <input type="text" id="nome" required>
+            </div>
+            <div class="form-group">
+                <label for="preco">Preço (R$):</label>
+                <input type="number" id="preco" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="estoque">Quantidade em Estoque:</label>
+                <input type="number" id="estoque" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="categoria">Categoria:</label>
+                <select id="categoria" required>
+                    <option value="material">Material Escolar</option>
+                    <option value="livros">Livros</option>
+                    <option value="uniforme">Uniforme</option>
+                </select>
+            </div>
+            <div class="modal-controls">
+                <button type="submit">Salvar Produto</button>
+                <button type="button" onclick="fecharModalProduto()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Array para armazenar os produtos
+        let produtos = [];
+        let carrinho = [];
+
+        // Funções do Modal de Produtos
+        function abrirModalProduto() {
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function fecharModalProduto() {
+            document.getElementById('product-modal').classList.add('hidden');
+            document.getElementById('product-form').reset();
+        }
+
+        // Funções do Carrinho
+        function abrirModalCarrinho() {
+            atualizarCarrinho();
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function fecharModalCarrinho() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        // Gerenciamento de Produtos
+        function adicionarProduto(event) {
+            event.preventDefault();
+            
+            const produto = {
+                id: Date.now(),
+                nome: document.getElementById('nome').value,
+                preco: parseFloat(document.getElementById('preco').value),
+                estoque: parseInt(document.getElementById('estoque').value),
+                categoria: document.getElementById('categoria').value
+            };
+
+            produtos.push(produto);
+            atualizarGrid();
+            fecharModalProduto();
+        }
+
+        function atualizarGrid() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+
+            produtos.forEach(produto => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <h3>${produto.nome}</h3>
+                    <p>R$ ${produto.preco.toFixed(2)}</p>
+                    <p>Estoque: ${produto.estoque}</p>
+                    <p>Categoria: ${produto.categoria}</p>
+                    <button onclick="adicionarAoCarrinho(${produto.id})" 
+                            ${produto.estoque <= 0 ? 'disabled' : ''}>
+                        ${produto.estoque <= 0 ? 'Sem Estoque' : 'Adicionar ao Carrinho'}
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Gerenciamento do Carrinho
+        function adicionarAoCarrinho(produtoId) {
+            const produto = produtos.find(p => p.id === produtoId);
+            if (produto && produto.estoque > 0) {
+                produto.estoque--;
+                
+                const itemCarrinho = carrinho.find(item => item.id === produtoId);
+                if (itemCarrinho) {
+                    itemCarrinho.quantidade++;
+                } else {
+                    carrinho.push({
+                        id: produto.id,
+                        nome: produto.nome,
+                        preco: produto.preco,
+                        quantidade: 1
+                    });
+                }
+
+                atualizarGrid();
+                atualizarContadorCarrinho();
+            }
+        }
+
+        function atualizarContadorCarrinho() {
+            const total = carrinho.reduce((sum, item) => sum + item.quantidade, 0);
+            document.getElementById('cart-count').textContent = total;
+        }
+
+        function atualizarCarrinho() {
+            const listaCarrinho = document.getElementById('cart-items');
+            const totalElement = document.getElementById('cart-total');
+            
+            listaCarrinho.innerHTML = '';
+            let total = 0;
+
+            carrinho.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    ${item.nome} - ${item.quantidade}x R$ ${item.preco.toFixed(2)}
+                    <button onclick="removerDoCarrinho(${item.id})">❌</button>
+                `;
+                listaCarrinho.appendChild(li);
+                total += item.preco * item.quantidade;
+            });
+
+            totalElement.textContent = `Total: R$ ${total.toFixed(2)}`;
+        }
+
+        function removerDoCarrinho(produtoId) {
+            const index = carrinho.findIndex(item => item.id === produtoId);
+            if (index > -1) {
+                const item = carrinho[index];
+                const produto = produtos.find(p => p.id === produtoId);
+                
+                if (item.quantidade > 1) {
+                    item.quantidade--;
+                } else {
+                    carrinho.splice(index, 1);
+                }
+
+                if (produto) {
+                    produto.estoque++;
+                }
+
+                atualizarGrid();
+                atualizarCarrinho();
+                atualizarContadorCarrinho();
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('cart-btn').addEventListener('click', abrirModalCarrinho);
+        document.getElementById('checkout-btn').addEventListener('click', () => {
+            alert('Compra finalizada com sucesso!');
+            carrinho = [];
+            atualizarCarrinho();
+            atualizarContadorCarrinho();
+            fecharModalCarrinho();
+        });
+
+        // Inicialização
+        atualizarContadorCarrinho();
+    </script>
+</body>
+</html>
