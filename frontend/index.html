@@ -1,40 +1,19 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Loja Escolar</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Loja Escolar</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Loja Escolar</h1>
-        <div class="cart-container">
-            <button id="cart-button">
-                🛒 Carrinho (<span id="cart-count">0</span>)
-            </button>
-        </div>
-    </header>
-    <div class="container">
-        <aside>
-            <h2>Filtros</h2>
-            <div class="filter-section">
-                <h3>Categorias</h3>
-                <div id="categorias-filtro"></div>
-            </div>
-        </aside>
-        <main>
-            <div id="produtos-grid"></div>
-        </main>
-    </div>
-    <div id="cart-modal" class="modal">
-        <div class="modal-content">
-            <h2>Carrinho de Compras</h2>
-            <div id="cart-items"></div>
-            <div id="cart-total"></div>
-            <button id="close-cart">Fechar</button>
-        </div>
-    </div>
-    <script src="scripts.js"></script>
+<header>
+  <h1>Loja Escolar</h1>
+  <button id="btnCarrinho">🛒 Carrinho <span id="badge">0</span></button>
+</header>
+<main>
+  <h2>Produtos</h2>
+  <div id="produtosGrid" class="grid"></div>
+</main>
+<script src="scripts.js"></script>
 </body>
 </html>
