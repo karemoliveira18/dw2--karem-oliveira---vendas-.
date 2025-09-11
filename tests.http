@@ -1,0 +1,23 @@
+### Listar produtos
+GET http://127.0.0.1:8000/produtos
+
+### Criar produto
+POST http://127.0.0.1:8000/produtos
+Content-Type: application/json
+
+{
+  "nome": "Produto Teste",
+  "descricao": "Descrição de teste",
+  "preco": 19.9,
+  "estoque": 10,
+  "categoria": "Teste"
+}
+
+### Confirmar carrinho
+POST http://127.0.0.1:8000/carrinho/confirmar
+Content-Type: application/json
+
+{
+  "itens": [ { "produto_id": 1, "quantidade": 1 } ],
+  "cupom": "ALUNO10"
+}
